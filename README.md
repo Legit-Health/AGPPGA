@@ -55,11 +55,13 @@ The NSL dataset consists of two subsets from which extra image crops are generat
 
 **How to Request Access:**
 
-Qualified scientific and medical researchers may request access to these datasets (including participant-level data). Requests must be made through the **[Vivli.org](https://vivli.org/)** data-sharing platform or by contacting the corresponding authors of the primary publications listed above.
+Qualified scientific and medical researchers may request access to these datasets (including participant-level data). Requests must be made through the **[Vivli.org](https://vivli.org/)** data-sharing platform or by contacting the corresponding authors of the primary publications listed above. Find more details in their respective original publications.
 
 ## Ethics, Consent, and Usage
 
-**NSL Dataset:** Images in the `/data/NSL/` folder were collected with **formal written informed consent** from all participants. These images are strictly non-identifiable and were obtained specifically for research purposes.
+**NSL Dataset (Consented):** Images in the /data/NSL/consented_images/ folder were collected with formal written informed consent from all participants. These images are strictly non-identifiable and were obtained specifically for research purposes.
+
+**NSL Dataset (Internet):** Images referenced in /data/NSL/internet_images_urls.txt were sourced from open internet repositories and used in accordance with their respective source policies.
 
 **Atlas images:** All images sourced from public dermatology atlases were used in strict accordance with their respective source policies and ethical guidelines.
 
