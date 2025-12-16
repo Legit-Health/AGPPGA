@@ -16,7 +16,7 @@ The study utilized three distinct image subsets to train and validate the AI mod
 
 **Description:** This dataset contains images of healthy skin or non-specific lesions that do not exhibit GPP symptoms. It was used to "anchor" the model's baseline for clear skin (GPPGA score = 0), improving its ability to distinguish low-severity lesions from normal skin.
 
-The NSL dataset consists of two subsets:
+The NSL dataset consists of two subsets from which extra image crops are generated:
 
 1. **Internet-Sourced Subset:** Images of healthy skin compiled from open internet sources. Due to licensing restrictions, we do not host these image files directly. Instead, a list of their original source URLs is provided in the file: `/data/NSL/internet_images_urls.txt`.
 
