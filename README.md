@@ -1,5 +1,7 @@
 # Development and assessment of an AI-based tool for scoring lesion severity in generalized pustular psoriasis clinical images (AGPPGA)
 
+[![DOI](https://zenodo.org/badge/1117492611.svg)](https://doi.org/10.5281/zenodo.17975532)
+
 ## Project Description
 
 This repository serves as the central data hub for the research article: **"Development and assessment of an AI-based tool for scoring lesion severity in generalized pustular psoriasis clinical images"**.
