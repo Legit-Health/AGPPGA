@@ -6,7 +6,7 @@ This repository serves as the central data hub for the research article: **"Deve
 
 The goal of this project was to develop **AGPPGA** (Automatic Generalized Pustular Psoriasis Physician Global Assessment), an artificial intelligence framework designed to assess the severity of Generalized Pustular Psoriasis (GPP) lesions from clinical images. By automating the grading of key visual signs—pustules, erythema, and scaling—this tool aims to reduce inter-rater variability and assist clinicians in making more objective severity assessments.
 
-This repository provides access to the **Non-Specific Lesion (NSL)** dataset, a curated index of public image sources, and detailed instructions for requesting access to the clinical trial data.
+This repository provides access to the Non-Specific Lesion (NSL) dataset, a curated index of public image sources, and detailed instructions for requesting access to the clinical trial data.
 
 ## Dataset Subsets
 
@@ -32,9 +32,9 @@ The NSL dataset consists of two subsets from which extra image crops are generat
 
 **Access:**
 
-**Public Images:** Sourced from [Dermatology Atlas](https://www.atlasdermatologico.com.br/), [Danderm](https://danderm-pdv.is.kkh.dk/), [DermNet NZ](https://dermnetnz.org/), [DermIS](https://www.dermis.net/dermisroot/en/home/index.html) (https://doi.org/10.1111/j.1346-8138.1998.tb02505.x).
+1. **Public Images:** Sourced from [Dermatology Atlas](https://www.atlasdermatologico.com.br/), [Danderm](https://danderm-pdv.is.kkh.dk/), [DermNet NZ](https://dermnetnz.org/), [DermIS](https://www.dermis.net/dermisroot/en/home/index.html) (https://doi.org/10.1111/j.1346-8138.1998.tb02505.x).
 
-**Private Images:** Sourced from the `EFFISAYIL® 1` clinical trail. See the *Private Data Access* section below.
+2. **Private Images:** Sourced from the `EFFISAYIL® 1` clinical trail. See the *Private Data Access* section below.
 
 ### 3. V2 Dataset
 
