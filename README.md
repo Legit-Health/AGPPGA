@@ -34,7 +34,7 @@ The NSL dataset consists of two subsets from which extra image crops are generat
 
 **Access:**
 
-1. **Public Images:** Sourced from [Dermatology Atlas](https://www.atlasdermatologico.com.br/), [Danderm](https://danderm-pdv.is.kkh.dk/), [DermNet NZ](https://dermnetnz.org/), [DermIS](https://www.dermis.net/dermisroot/en/home/index.html) (https://doi.org/10.1111/j.1346-8138.1998.tb02505.x).
+1. **Public Images:** Sourced from [Dermatology Atlas](https://www.atlasdermatologico.com.br/), [Danderm](https://danderm-pdv.is.kkh.dk/), [DermNet](https://dermnet.com/) (available at [link](https://www.kaggle.com/datasets/shubhamgoel27/dermnet/)), [DermNet NZ](https://dermnetnz.org/), [DermIS](https://www.dermis.net/dermisroot/en/home/index.html) (https://doi.org/10.1111/j.1346-8138.1998.tb02505.x), [DermQuest](http://dermquest.com/). Image URLs are located at `data/V1_public_image_urls.csv`, except for the DermQuest dataset, which is unavailable at the moment of reporting this study.
 
 2. **Private Images:** Sourced from the `EFFISAYIL® 1` clinical trail. See the *Private Data Access* section below.
 
