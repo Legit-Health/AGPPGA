@@ -6,9 +6,9 @@
 
 This repository serves as the central data hub for the research article: **"Development and assessment of an AI-based tool for scoring lesion severity in generalized pustular psoriasis clinical images"**.
 
-The goal of this project was to develop **AGPPGA** (Automatic Generalized Pustular Psoriasis Physician Global Assessment), an artificial intelligence framework designed to assess the severity of Generalized Pustular Psoriasis (GPP) lesions from clinical images. By automating the grading of key visual signs—pustules, erythema, and scaling—this tool aims to reduce inter-rater variability and assist clinicians in making more objective severity assessments.
+The goal of this project was to develop **AGPPGA** (Automatic Generalized Pustular Psoriasis Physician Global Assessment), an artificial intelligence framework designed to assess the severity of Generalized Pustular Psoriasis (GPP) lesions from clinical images. By automating the grading of key visual signs (pustules, erythema, and scaling) this tool aims to reduce inter-rater variability and assist clinicians in making more objective severity assessments.
 
-This repository provides access to the Non-Specific Lesion (NSL) dataset, a curated index of public image sources, and detailed instructions for requesting access to the clinical trial data.
+This repository provides access to the Non-Specific Lesion (NSL) dataset, a curated index of public image sources, detailed instructions for requesting access to the clinical trial data, pseudocode, and model optimization plots.
 
 ## Dataset Subsets
 
@@ -61,15 +61,15 @@ Qualified scientific and medical researchers may request access to these dataset
 
 ## Ethics, Consent, and Usage
 
-**NSL Dataset (Consented):** Images in the /data/NSL/consented_images/ folder were collected with formal written informed consent from all participants. These images are strictly non-identifiable and were obtained specifically for research purposes.
+**NSL Dataset (Consented):** Images in the `/data/NSL/consented_images/` folder were collected with formal written informed consent from all participants. These images are strictly non-identifiable and were obtained specifically for research purposes.
 
-**NSL Dataset (Internet):** Images referenced in /data/NSL/internet_images_urls.txt were sourced from open internet repositories and used in accordance with their respective source policies.
+**NSL Dataset (Internet):** Images referenced in `/data/NSL/internet_images_urls.txt` were sourced from open internet repositories and used in accordance with their respective source policies.
 
 **Atlas images:** All images sourced from public dermatology atlases were used in strict accordance with their respective source policies and ethical guidelines.
 
 **Clinical trial images:** Images from the EFFISAYIL® 1 and 2 trials were obtained and used in accordance with the ethical approvals, informed consent protocols, and data sharing specifications detailed in their respective primary publications.
 
-**Software Code:** The AGPPGA software code is proprietary to **Legit.Health** and is not available for public distribution.
+**Software Code:** The AGPPGA software code is proprietary to **Legit.Health** and is not available for public distribution. Nevertheless, the detailed pseudocode and model optimization plots are located in `/pseudocode` and `/model_plots`.
 
 **Usage Note:** The data provided in this repository is for research and validation purposes only. Any use of the images must comply with the original copyright holders' terms.
 
@@ -86,4 +86,4 @@ The datasets, images, and documentation in this repository are licensed under th
 
 
 **Note on Software:**
-The **AGPPGA software code** and model weights are **proprietary intellectual property of Legit.Health** and are **NOT** included in this license. This repository provides only the dataset information and documentation necessary for methodological replication.
+The **AGPPGA software code** and model weights are **proprietary intellectual property of Legit.Health** and are **NOT** included in this license. This repository provides only the information and documentation necessary for methodological replication.
