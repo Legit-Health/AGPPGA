@@ -1,0 +1,114 @@
+// This script implements the training pipeline of the multi-task learning model
+// The training includes curriculum learning, dynamic loss weighting, Gradient
+// scaling, model checkpointing, etc.
+
+
+
+FUNCTION TrainEpoch(train_dataloader, model, lambda_weights, optimizer, scaler):
+    /* Executes one pass of the training data */
+    SET model to training mode
+    
+    epoch_stats = EMPTY LIST
+
+    FOR EACH batch (images, ground_truth_labels) IN train_dataloader:
+        ENABLE Mixed Precision:
+            // Forward pass
+            predictions = model(images)
+            // Compute metrics and losses per task, weighted by lambda_weights
+            stats = CalculateMetricsAndLosses(predictions, ground_truth_labels, lambda_weights)
+            APPEND stats TO epoch_stats
+
+        // Backpropagation with Gradient Scaling
+        scaled_loss = scaler.Scale(stats.total_loss)
+        scaled_loss.Backward()
+        
+        ClipGradients(model.parameters, max_norm=0.50)
+        
+        scaler.Step(optimizer)
+        scaler.Update()
+        optimizer.ZeroGradients()
+        
+    RETURN epoch_stats
+    
+    
+FUNCTION TestEpoch(test_dataloader, model, lambda_weights):
+    /* Evaluates the model on validation data without updating weights */
+    SET model to evaluation mode
+    
+    all_predictions = EMPTY LIST
+    all_ground_truths = EMPTY LIST
+    
+    DISABLE Gradient Tracking:
+        FOR EACH batch (images, ground_truth_labels) IN test_dataloader:
+            predictions = model(images)
+            APPEND predictions TO all_predictions
+            APPEND ground_truth_labels TO all_ground_truths
+            
+    // Aggregate all batches to compute final metrics
+    epoch_stats = CalculateMetricsAndLosses(all_predictions, all_ground_truths, lambda_weights)
+    
+    RETURN epoch_stats
+    
+
+FUNCTION ExecuteTrainingPhase(model, tasks, train_loader, test_loader, num_epochs, optimizer, scaler):
+    /* Runs the epoch loop */
+    
+    train_stats_history = EMPTY LIST
+    val_stats_history = EMPTY LIST
+    
+    FOR epoch = 0 TO num_epochs - 1:
+        
+        // 1. Calculate dynamic task weights (DWA)
+        lambda_weights = CalculateDynamicWeightAverage(tasks, train_stats_history, epoch)
+            
+        // 2. Train and Evaluate
+        train_stats = TrainEpoch(train_loader, model, lambda_weights, optimizer, scaler)
+        val_stats = TestEpoch(test_loader, model, lambda_weights)
+        
+        // 3. Track losses for future DWA calculations
+        APPEND train_stats TO train_stats_history
+        APPEND val_stats TO val_stats_history
+        
+        // 4. Checkpointing and Logging
+        SaveModelIfBest(val_stats) 
+        
+
+MAIN SCRIPT:
+    // 1. Initial Setup
+    tasks = ["Pustulation", "Erythema", "Desquamation"]
+    model = model(tasks, use_pretrained_weights=TRUE)
+    scaler = InitializeMixedPrecisionScaler()
+    
+    // 2. PHASE 1: Curriculum Learning (Frozen Backbone)
+    // Progressively train on larger image sizes while the main feature extractor is frozen
+    curriculum_sizes = [384, 492, 600] 
+    
+    FOR EACH img_size IN curriculum_sizes:
+        FreezeModelBackbone()
+        
+        // Apply lower learning rate to the encoder (even though it's frozen)
+        optimizer = InitializeOptimizer(base_lr=0.0005, weigth_decay=0.001, warmup_epochs=5)
+        
+        // Get data loaders with upsampling mechanisms
+        train_loader, test_loader = LoadData(img_size, batch_size=40)
+        
+        ExecuteTrainingPhase(model, tasks, train_loader, test_loader, num_epochs=40, optimizer, scaler)
+        
+        
+    // 3. PHASE 2: Full Fine-Tuning (Unfrozen Backbone)
+    // Train the entire network end-to-end on the final resolution
+    UnfreezeModelBackbone()
+    
+    // Reduce the learning rate by 0.5 for the unfrozen phase
+    optimizer = InitializeOptimizer(base_lr=0.0005 * 0.5, weigth_decay=0.001, encoder_lr_factor=0.5, warmup_epochs=5)
+    
+    // Get data loaders with upsampling mechanisms
+    train_loader, test_loader = LoadData(img_size=600, batch_size=40)
+    
+    ExecuteTrainingPhase(model, tasks, train_loader, test_loader, num_epochs=120, optimizer, scaler)
+    
+    // 4. Finalization
+    GeneratePerformancePlots()
+    PRINT "Training Complete."
+    
+    

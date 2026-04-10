@@ -1,0 +1,110 @@
+// This script implements a multi-task classification model with a mixture of experts (MoE).
+// The last block of the image encoder is replicated to create one expert per task and one shared expert.
+// Each expert's output is combined with the shared expert's output using a gating mechanism.
+// The architecture of each expert matches the image encoder block they replace.
+
+
+
+FUNCTION InitializeGate(input_feature_size):
+    /* Creates a small neural network to decide the weight of each expert */
+    RETURN a sequential pipeline consisting of:
+        1. Global Average Pooling (to reduce spatial dimensions to 1x1)
+        2. Dropout (20% probability to prevent overfitting)
+        3. Flatten (convert 2D maps to a 1D vector)
+        4. Linear Layer (maps input_feature_size to 2 output values)
+        5. Softmax (normalizes the 2 values into probabilities/weights that sum to 1)
+        
+
+FUNCTION SplitEncoder(original_image_encoder, layer_to_break_at):
+    /* Splits a single encoder into a base feature extractor and an expert block */
+    base_layers = EMPTY LIST
+    expert_layers = EMPTY LIST
+    current_target_list = base_layers
+
+    FOR EACH (layer_name, layer) IN original_image_encoder:
+        IF layer_name EQUALS layer_to_break_at:
+            current_target_list = expert_layers  // Switch target list
+        
+        APPEND layer TO current_target_list
+
+    base_image_encoder = sequence of(base_layers)
+    expert_image_encoder_block = sequence of(expert_layers)
+    
+    RETURN base_image_encoder, expert_image_encoder_block
+
+
+CLASS MultiTaskLearningModel:
+
+    METHOD Constructor(list_of_tasks, use_pretrained_weights):
+        self.list_of_tasks = list_of_tasks
+    
+        // 1. Load the foundation image encoder (e.g., caformer_s)
+        full_encoder = LoadTimmModel("caformer_s", use_pretrained_weights)
+
+        // 2. Split the encoder to create the base and the expert template
+        // caformer_s base_encoder has an output feature size of 320
+        // caformer_s expert_template has an output feature size of 512
+        self.base_encoder, expert_template = SplitEncoder(full_encoder, break_at="stages_3")
+
+        // 3. Initialize the Mixture of Experts
+        self.shared_expert = Copy(expert_template)
+        
+        self.specific_experts = EMPTY DICTIONARY
+        FOR EACH task IN list_of_tasks:
+            self.specific_experts[task] = Copy(expert_template)
+
+        // 4. Initialize the Gating Networks
+        self.gates = EMPTY DICTIONARY
+        FOR EACH task IN list_of_tasks:
+            self.gates[task] = InitializeGate(input_feature_size=320)
+
+        // 5. Initialize Task-Specific Classification Heads
+        self.task_heads = EMPTY DICTIONARY
+        FOR EACH task IN list_of_tasks:
+            self.task_heads[task] = sequential pipeline consisting of:
+                - Global Average Pooling
+                - Flatten
+                - Dropout (20%)
+                - Linear Layer (512 inputs -> 512 outputs)
+                - ReLU Activation
+                - Dropout (20%)
+                - Linear Layer (512 inputs -> 5 output classes)
+                - Softmax Activation (for final class probabilities)
+
+
+    METHOD ForwardPass(input_image):
+        // Step 1: Extract base features
+        base_features = self.base_encoder(input_image)
+
+        // Step 2: Compute shared expert features
+        shared_output = self.shared_expert(base_features)
+
+        // Step 3: Compute task-specific expert features
+        specific_outputs = EMPTY DICTIONARY
+        FOR EACH task IN self.specific_experts:
+            specific_outputs[task] = self.specific_experts[task](base_features)
+            
+        // Step 4: Compute task-specific gate weights
+        gate_weights = EMPTY DICTIONARY
+        FOR EACH task IN self.gates:
+            gate_weights[task] = self.gates[task](base_features)
+
+        // Step 5: Combine shared and specific outputs using gate weights
+        combined_features = EMPTY DICTIONARY
+        FOR EACH task IN list_of_tasks:
+            weight_for_shared = gate_weights[task][:,0]
+            weight_for_specific = gate_weights[task][:,1]
+
+            // Blend the feature maps based on the gate's decision
+            blended_output = (shared_output * weight_for_shared) + 
+                             (specific_outputs[task] * weight_for_specific)
+                             
+            combined_features[task] = blended_output
+
+        // Step 6: Generate final predictions
+        predictions = EMPTY DICTIONARY
+        FOR EACH task IN self.task_heads:
+            predictions[task] = self.task_heads[task](combined_features[task])
+
+        RETURN predictions
+
