@@ -1,6 +1,8 @@
 // This script implements a multi-task classification model with a mixture of experts (MoE).
-// The last block of the image encoder is replicated to create one expert per task and one shared expert.
+// The last block of the image encoder (CAFormer-S) is replicated to create one expert per task and one shared expert.
 // Each expert's output is combined with the shared expert's output using a gating mechanism.
+// Each expert retains the CAFormer-S block's normalization (LayerNorm) and activation (StarReLU).
+// This is a single-level Customized Gate Control (CGC) block, the one-layer case of PLE (Tang et al., 2020), with dense soft gating.
 // The architecture of each expert matches the image encoder block they replace.
 
 
@@ -38,7 +40,7 @@ CLASS MultiTaskLearningModel:
     METHOD Constructor(list_of_tasks, use_pretrained_weights):
         self.list_of_tasks = list_of_tasks
     
-        // 1. Load the foundation image encoder (e.g., caformer_s)
+        // 1. Load the foundation image encoder (caformer_s) and its weights
         full_encoder = LoadTimmModel("caformer_s", use_pretrained_weights)
 
         // 2. Split the encoder to create the base and the expert template
@@ -47,6 +49,7 @@ CLASS MultiTaskLearningModel:
         self.base_encoder, expert_template = SplitEncoder(full_encoder, break_at="stages_3")
 
         // 3. Initialize the Mixture of Experts
+        // shared_expert and specific_experts are copies of the pretrained final-block weights (not random init)
         self.shared_expert = Copy(expert_template)
         
         self.specific_experts = EMPTY DICTIONARY
@@ -54,11 +57,13 @@ CLASS MultiTaskLearningModel:
             self.specific_experts[task] = Copy(expert_template)
 
         // 4. Initialize the Gating Networks
+        // Gating Networks are initialized randomly 
         self.gates = EMPTY DICTIONARY
         FOR EACH task IN list_of_tasks:
             self.gates[task] = InitializeGate(input_feature_size=320)
 
         // 5. Initialize Task-Specific Classification Heads
+        // Classification Heads are initialized randomly 
         self.task_heads = EMPTY DICTIONARY
         FOR EACH task IN list_of_tasks:
             self.task_heads[task] = sequential pipeline consisting of:
@@ -95,7 +100,7 @@ CLASS MultiTaskLearningModel:
             weight_for_shared = gate_weights[task][:,0]
             weight_for_specific = gate_weights[task][:,1]
 
-            // Blend the feature maps based on the gate's decision
+            // Blend the feature maps based on the gate's decision with a weighted sum
             blended_output = (shared_output * weight_for_shared) + 
                              (specific_outputs[task] * weight_for_specific)
                              
