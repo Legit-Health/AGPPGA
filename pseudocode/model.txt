@@ -97,10 +97,12 @@ CLASS MultiTaskLearningModel:
         // Step 5: Combine shared and specific outputs using gate weights
         combined_features = EMPTY DICTIONARY
         FOR EACH task IN list_of_tasks:
-            weight_for_shared = gate_weights[task][:,0]
-            weight_for_specific = gate_weights[task][:,1]
+            weight_for_shared = gate_weights[task][:,0]     // scalar per sample, shared expert
+            weight_for_specific = gate_weights[task][:,1]   // scalar per sample, task-specific expert
 
-            // Blend the feature maps based on the gate's decision with a weighted sum
+            // Each scalar weight is broadcast across all channels (and spatial
+            // positions) of its expert feature map: this is a weighted sum of
+            // whole expert outputs, NOT a per-channel scaling.
             blended_output = (shared_output * weight_for_shared) + 
                              (specific_outputs[task] * weight_for_specific)
                              
