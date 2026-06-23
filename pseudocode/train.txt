@@ -75,7 +75,7 @@ FUNCTION ExecuteTrainingPhase(model, tasks, train_loader, test_loader, num_epoch
 
 MAIN SCRIPT:
     // 1. Initial Setup
-    tasks = ["Pustulation", "Erythema", "Desquamation"]
+    tasks = ["Pustulation", "Erythema", "Scaling"]
     model = model(tasks, use_pretrained_weights=TRUE)
     scaler = InitializeMixedPrecisionScaler()
     
